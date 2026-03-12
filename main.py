@@ -448,7 +448,8 @@ def main():
         try:
             run_scheduler(interval_hours=args.interval, run_immediately=True)
         except KeyboardInterrupt:
-            print("\n爬虫已停止")
+            print("\n正在保存数据...")
+            print("爬虫已停止")
             sys.exit(0)
 
 

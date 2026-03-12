@@ -163,7 +163,9 @@ class ArticleSpider:
             }
         finally:
             self.fetcher.close()
-    
+            # 确保存储的数据（包括未满100篇的待写入文章）被保存到磁盘
+            self.storage.close()
+
     def _batch_check_exists(self, article_ids):
         """
         批量检查文章是否存在

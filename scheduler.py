@@ -92,18 +92,24 @@ class CrawlerScheduler:
         self.running = False
         if self.job:
             schedule.cancel_job(self.job)
-        
-        # 关闭爬虫
+
+        # 关闭爬虫并保存所有未写入的数据
         if self.spider:
             try:
-                self.spider.storage.close()
-            except:
-                pass
+                # 先尝试调用 storage.close() 保存未满100篇的数据
+                if hasattr(self.spider, 'storage') and self.spider.storage:
+                    pending = len(self.spider.storage._pending_articles)
+                    if pending > 0:
+                        logger.info(f"正在保存待写入的 {pending} 篇文章...")
+                    self.spider.storage.close()
+                    logger.info("所有数据已保存到磁盘")
+            except Exception as e:
+                logger.error(f"关闭存储时出错: {str(e)}")
             self.spider = None
-        
+
         # 强制垃圾回收
         gc.collect()
-        
+
         logger.info("调度器已停止，资源已释放")
     
     def run_once(self):
